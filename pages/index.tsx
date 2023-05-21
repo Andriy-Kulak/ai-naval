@@ -60,6 +60,13 @@ function Home() {
 
     setLoading(true);
 
+    const reqBody = {
+      messages: props?.name ? undefined : [...messages, message],
+      userName: userName || props?.name,
+    };
+
+    console.log("api reqBody:", reqBody);
+
     // response for chat gpt
     const response = await fetch("/api/chat", {
       method: "POST",
@@ -68,11 +75,10 @@ function Home() {
         "Access-Control-Allow-Origin": "*",
         Accept: "application/json",
       },
-      body: JSON.stringify({
-        messages: props?.name ? undefined : [...messages, message],
-        userName: userName || props?.name,
-      }),
+      body: JSON.stringify(reqBody),
     });
+
+    console.log("api response:", response);
 
     const { audioDataBase64, translatedText } = await response.json();
 
