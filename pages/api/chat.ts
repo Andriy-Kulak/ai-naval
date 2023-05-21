@@ -52,13 +52,15 @@ async function askOpenAI({
 }) {
   const pinecone = await pineconeStore();
 
-  console.log("messages", messages);
+  console.log("messages req: ", messages);
 
   // updated the message content to include context snippets
   if (messages?.length > 0) {
     const lastMsgContent = messages[messages.length - 1].content;
 
     const data = await pinecone.similaritySearch(lastMsgContent, 3);
+
+    console.log("pinecone data.length: ", data.length);
 
     const updatedMsgContent = `
     user question/statement: ${lastMsgContent}
@@ -73,6 +75,8 @@ async function askOpenAI({
 
     messages[messages.length - 1].content = updatedMsgContent;
   }
+
+  console.log("messages after pinecone: ", messages);
 
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo-0301",
