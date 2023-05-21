@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Head from "next/head";
-import { FaMicrophone, FaTwitter } from "react-icons/fa";
+import { FaTwitter } from "react-icons/fa";
 import Beatloader from "react-spinners/BeatLoader";
 import base64ToBlob from "@/utils/basetoblob";
 import {
@@ -19,18 +19,8 @@ import {
 import { handleEnterKeyPress } from "@/utils";
 import NameInput from "@/components/NameInput";
 import { Message } from "@/types";
-import useIsChrome from "@/hooks/useIsChrome";
-
-let SpeechRecognition: { new (): SpeechRecognition };
-
-if (typeof window !== "undefined") {
-  SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-}
 
 function Home() {
-  const isChrome = useIsChrome();
-  const micRef = useRef<SpeechRecognition>();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -40,13 +30,8 @@ function Home() {
   };
 
   const toast = useToast();
-
-  const [isListening, setIsListening] = useState(false);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [speechRecognition, setSpeechRecognition] =
-    useState<SpeechRecognition | null>(null);
 
   // on the first translate, we need to get the user's name
   // on subsequent translates, we can use the name from state
@@ -76,7 +61,7 @@ function Home() {
     setLoading(true);
 
     // response for chat gpt
-    const response = await fetch("/api/translate", {
+    const response = await fetch("/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -114,46 +99,10 @@ function Home() {
     await audioRef.current.play();
   };
 
-  // testing
-  const handleListen = async (mic: any) => {
-    if (!SpeechRecognition)
-      return alert("Speech recognition is not available in your browser.");
-
-    mic.continuous = true;
-    mic.interimResults = true;
-    mic.lang = "es-ES";
-
-    if (isListening) mic.start();
-    if (!isListening) mic.stop();
-
-    mic.onresult = (event: SpeechRecognitionEvent) => {
-      const transcript = Array.from(event.results)
-        .map((result) => result[0])
-        .map((result) => result.transcript)
-        .join("");
-      setText(transcript);
-      mic.onerror = (event: SpeechRecognitionErrorEvent) => {
-        console.log(event.error);
-      };
-    };
-  };
-
   useEffect(() => {
-    const mic = new SpeechRecognition();
-
-    micRef.current = mic;
-
     const audio = new Audio();
     audioRef.current = audio;
-
-    return () => {
-      mic.stop();
-    };
   }, []);
-
-  useEffect(() => {
-    handleListen(micRef.current);
-  }, [isListening]);
 
   const userBgColor = useColorModeValue("blue.500", "blue.300");
   const assistantBgColor = useColorModeValue("gray.100", "gray.700");
@@ -169,7 +118,7 @@ function Home() {
       <Head>
         <title>Naval AI Bot</title>
       </Head>
-      <VStack pt={40} px={4} spacing={4} h="100vh" maxW="600px" mx="auto">
+      <VStack pt={40} px={4} mb={100} spacing={4} maxW="600px" mx="auto">
         <Heading as="h1" color="black">
           AI Naval That Gives Advice
         </Heading>
@@ -184,9 +133,6 @@ function Home() {
           >
             <Icon as={FaTwitter} fontSize="md" />
           </Link>
-        </Text>
-        <Text color="black" as="i">
-          <b> Microphone works well in Google Chrome only (for now).</b>
         </Text>
 
         {!userName ? (
@@ -243,26 +189,22 @@ function Home() {
                 variant="outline"
                 onClick={() => {
                   translate();
+
+                  console.log(
+                    "document.body.scrollHeight",
+                    document.body.scrollHeight
+                  );
+                  window.scrollTo({
+                    left: 0,
+                    top: document.body.scrollHeight,
+                    behavior: "smooth",
+                  });
                 }}
                 isLoading={loading}
                 spinner={<Beatloader size={8} />}
               >
                 Send
               </Button>
-              {isChrome && (
-                <Icon
-                  as={FaMicrophone}
-                  cursor="pointer"
-                  color={isListening ? "red.500" : "gray.500"}
-                  onClick={() => {
-                    if (isListening === true) {
-                      translate();
-                    }
-                    setIsListening(!isListening);
-                    setText("");
-                  }}
-                />
-              )}
             </HStack>
           </>
         )}
