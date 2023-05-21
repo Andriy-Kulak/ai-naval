@@ -58,7 +58,7 @@ async function askOpenAI({
   if (messages?.length > 0) {
     const lastMsgContent = messages[messages.length - 1].content;
 
-    const data = await pinecone.similaritySearch(lastMsgContent, 3);
+    const data = await pinecone.similaritySearch(lastMsgContent, 2);
 
     console.log("pinecone data.length: ", data.length);
 
@@ -69,8 +69,6 @@ async function askOpenAI({
     1) ${data?.[0]?.pageContent}
     ---
     2) ${data?.[1]?.pageContent}
-    ---
-    3) ${data?.[2]?.pageContent}
     `;
 
     messages[messages.length - 1].content = updatedMsgContent;
