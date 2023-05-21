@@ -75,28 +75,32 @@ async function askOpenAI({
   // }
 
   console.log("messages length after pinecone: ", messages?.length);
-
-  const response = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo-0301",
-    messages: [
-      {
-        role: "system",
-        content: `
+  try {
+    const response = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo-0301",
+      messages: [
+        {
+          role: "system",
+          content: `
         Imagine you are Naval Ravikant and you want to give advice to the user you're interacting with that may ask you questions or advice. The user's name is ${userName}.
         I will provide you context snippets from "The Almanack of Naval Ravikant" from a vecor database to help you answer the user's questions.
         Introduce youself to ${userName}. Don't mention context snippets when replying to user and only mention yourself by your first name.
         `,
-      },
-      ...(messages || [
-        {
-          role: "user",
-          content: "Hi There!",
         },
-      ]),
-    ],
-  });
+        ...(messages || [
+          {
+            role: "user",
+            content: "Hi There!",
+          },
+        ]),
+      ],
+    });
 
-  console.log("response: ", response);
+    console.log("response: ", response);
 
-  return response.data.choices[0].message?.content;
+    return response.data.choices[0].message?.content;
+  } catch (e: any) {
+    console.log("error in response: ", e.message);
+    return "There was an error in processing the ai response.";
+  }
 }
