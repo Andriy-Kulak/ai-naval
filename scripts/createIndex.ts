@@ -43,25 +43,6 @@ dotenv.config();
 
   const splitDocs = await splitter.splitDocuments(docs);
 
-  //   const docs = [
-  //     new Document({
-  //       metadata: { foo: "bar" },
-  //       pageContent: "pinecone is a vector db",
-  //     }),
-  //     new Document({
-  //       metadata: { foo: "bar" },
-  //       pageContent: "the quick brown fox jumped over the lazy dog",
-  //     }),
-  //     new Document({
-  //       metadata: { baz: "qux" },
-  //       pageContent: "lorem ipsum dolor sit amet",
-  //     }),
-  //     new Document({
-  //       metadata: { baz: "qux" },
-  //       pageContent: "pinecones are the woody fruiting body and of a pine tree",
-  //     }),
-  //   ];
-
   await PineconeStore.fromDocuments(splitDocs, new OpenAIEmbeddings(), {
     pineconeIndex,
   });
