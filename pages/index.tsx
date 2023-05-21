@@ -78,9 +78,11 @@ function Home() {
       body: JSON.stringify(reqBody),
     });
 
-    console.log("api response:", response);
+    const jsonResp = await response.json();
 
-    const { audioDataBase64, translatedText } = await response.json();
+    console.log("api jsonResp response:", jsonResp);
+
+    const { audioDataBase64, translatedText } = jsonResp;
 
     addMessage({ role: "assistant", content: translatedText });
 
