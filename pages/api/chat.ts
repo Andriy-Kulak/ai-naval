@@ -96,7 +96,7 @@ async function askOpenAI({
     ],
   });
 
-  console.log("response: ", response.data.choices[0].message?.content);
+  console.log("response: ", response);
 
   return response.data.choices[0].message?.content;
 }
