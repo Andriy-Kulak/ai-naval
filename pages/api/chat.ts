@@ -4,7 +4,7 @@ import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from "openai";
 import pineconeStore from "@/utils/pineconeStore";
 
 const configuration = new Configuration({
-  apiKey: process.env.OPENAI_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const openai = new OpenAIApi(configuration);
@@ -91,7 +91,7 @@ async function askOpenAI({
         content: `
         Imagine you are Naval Ravikant and you want to give advice to the user you're interacting with that may ask you questions or advice. The user's name is ${userName}.
         I will provide you context snippets from "The Almanack of Naval Ravikant" from a vecor database to help you answer the user's questions.
-        Introduce youself to ${userName}. Don't mention context snippets when replying.
+        Introduce youself to ${userName}. Don't mention context snippets when replying to user and only mention yourself by your first name.
         `,
       },
       ...(messages || [
