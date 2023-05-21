@@ -35,3 +35,14 @@ To properly configure open ai for best experience, refer to deep learning course
 Open AI does a fairly good job with translating but it's not perfect. Here is another provider for more precise translation:
 
 - https://www.deepl.com/translator
+
+### More docs
+
+- https://js.langchain.com/docs/modules/indexes/vector_stores/integrations/pinecone
+
+## To Do
+
+- create a JS script for embedding vector dbs
+- update docs
+- update voice
+- rename api

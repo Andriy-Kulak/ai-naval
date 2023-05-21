@@ -1,6 +1,7 @@
 import { Message } from "@/types";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Configuration, OpenAIApi } from "openai";
+import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from "openai";
+import pineconeStore from "@/utils/pineconeStore";
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_KEY,
@@ -49,14 +50,52 @@ async function askOpenAI({
   messages: Message[];
   userName: string;
 }) {
+  const pinecone = await pineconeStore();
+
+  // console.log("data.length ============>", data.length);
+  //  console.log("data first [0]", data[0]);
+
+  console.log("messages", messages);
+
+  // updated the message content to include context snippets
+  if (messages?.length > 0) {
+    const lastMsgContent = messages[messages.length - 1].content;
+
+    const data = await pinecone.similaritySearch(lastMsgContent, 4);
+
+    console.log("data.length ============>", data.length);
+
+    const updatedMsgContent = `
+    user question/statement: ${lastMsgContent}
+    context snippets:
+    ---
+    1) ${data?.[0]?.pageContent}
+    ---
+    2) ${data?.[1]?.pageContent}
+    ---
+    3) ${data?.[2]?.pageContent}
+    ---
+    4) ${data?.[3]?.pageContent}
+    `;
+
+    messages[messages.length - 1].content = updatedMsgContent;
+  }
+
+  console.log("messages after", messages);
+
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo-0301",
     messages: [
       {
         role: "system",
-        content: `Imagine you are a spanish teacher having conversation with a student that is looking to improve their spanish. User will start the conversion with you and you will respond to them and ask about them. If they user asks you a question, you can help them restructure the question in spanish and continue the conversion. The user's name is ${userName}.`,
+        content: `Imagine you are Naval Ravikant and you want to give advice to the user you're interacting with that may ask you questions or advice. The user's name is ${userName}. I will provide you context snippets from "The Almanack of Naval Ravikant" from a vecor database to help you answer the user's questions. Introduce youself to ${userName}"`,
       },
-      ...messages,
+      ...(messages || [
+        {
+          role: "user",
+          content: "Hi There!",
+        },
+      ]),
     ],
   });
 

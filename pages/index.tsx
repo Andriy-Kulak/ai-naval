@@ -84,7 +84,7 @@ function Home() {
         Accept: "application/json",
       },
       body: JSON.stringify({
-        messages: [...messages, message],
+        messages: props?.name ? undefined : [...messages, message],
         userName: userName || props?.name,
       }),
     });
@@ -162,20 +162,21 @@ function Home() {
 
   const [userName, setUserName] = useState<null | string>(null);
 
-  const assistantName = "Tutor";
+  const assistantName = "AI Naval";
 
   return (
     <>
       <Head>
-        <title>tu tutor</title>
+        <title>Naval AI Bot</title>
       </Head>
       <VStack pt={40} px={4} spacing={4} h="100vh" maxW="600px" mx="auto">
         <Heading as="h1" color="black">
-          Your Tutor in Spanish
+          AI Naval That Gives Advice
         </Heading>
-        <Text color="black">
-          Start a conversation with AI tutor in Spanish. For more tutorials &
-          content, you can follow me on Twitter{" "}
+        <Text color="black" as="i" fontSize="xs">
+          Start a conversation with AI Naval. This is meant for research
+          purposes only. Real Naval Ravikant is not associated with this app.
+          For more tutorials & content, you can follow me on Twitter{" "}
           <Link
             href="https://twitter.com/emergingbits"
             color="#1DA1F2"
