@@ -98,7 +98,7 @@ async function askOpenAI({
 
     console.log("response: ", response);
 
-    return response.data.choices[0].message?.content;
+    return response?.data?.choices?.[0]?.message?.content;
   } catch (e: any) {
     console.log("error in response: ", e.message);
     return "There was an error in processing the ai response.";
