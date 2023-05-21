@@ -76,7 +76,7 @@ async function askOpenAI({
     messages[messages.length - 1].content = updatedMsgContent;
   }
 
-  console.log("messages after pinecone: ", messages.length);
+  console.log("messages length after pinecone: ", messages?.length);
 
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo-0301",
