@@ -46,3 +46,4 @@ Open AI does a fairly good job with translating but it's not perfect. Here is an
 - update docs
 - update voice
 - rename api
+- had to install `npm install pdf-parse`
