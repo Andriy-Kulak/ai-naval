@@ -190,10 +190,6 @@ function Home() {
                 onClick={() => {
                   translate();
 
-                  console.log(
-                    "document.body.scrollHeight",
-                    document.body.scrollHeight
-                  );
                   window.scrollTo({
                     left: 0,
                     top: document.body.scrollHeight,

@@ -1,6 +1,6 @@
 import { Message } from "@/types";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from "openai";
+import { Configuration, OpenAIApi } from "openai";
 import pineconeStore from "@/utils/pineconeStore";
 
 const configuration = new Configuration({
@@ -52,18 +52,13 @@ async function askOpenAI({
 }) {
   const pinecone = await pineconeStore();
 
-  // console.log("data.length ============>", data.length);
-  //  console.log("data first [0]", data[0]);
-
   console.log("messages", messages);
 
   // updated the message content to include context snippets
   if (messages?.length > 0) {
     const lastMsgContent = messages[messages.length - 1].content;
 
-    const data = await pinecone.similaritySearch(lastMsgContent, 4);
-
-    console.log("data.length ============>", data.length);
+    const data = await pinecone.similaritySearch(lastMsgContent, 3);
 
     const updatedMsgContent = `
     user question/statement: ${lastMsgContent}
@@ -74,14 +69,10 @@ async function askOpenAI({
     2) ${data?.[1]?.pageContent}
     ---
     3) ${data?.[2]?.pageContent}
-    ---
-    4) ${data?.[3]?.pageContent}
     `;
 
     messages[messages.length - 1].content = updatedMsgContent;
   }
-
-  console.log("messages after", messages);
 
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo-0301",
@@ -102,6 +93,8 @@ async function askOpenAI({
       ]),
     ],
   });
+
+  console.log("response: ", response.data.choices[0].message?.content);
 
   return response.data.choices[0].message?.content;
 }
