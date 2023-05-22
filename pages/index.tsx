@@ -21,8 +21,10 @@ import NameInput from "@/components/NameInput";
 import { Message } from "@/types";
 
 function Home() {
+  // ref need to play audio
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // storing array messages in state
   const [messages, setMessages] = useState<Message[]>([]);
 
   const addMessage = (message: Message) => {
@@ -30,12 +32,13 @@ function Home() {
   };
 
   const toast = useToast();
-  const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // on the first translate, we need to get the user's name
-  // on subsequent translates, we can use the name from state
-  const translate = async (props?: { name?: string }) => {
+  // tracking user input
+  const [text, setText] = useState("");
+
+  // function to execute api request and communicate with open ai, pinecone & eleven labs
+  const askAi = async (props?: { name?: string }) => {
     if (!text && !props?.name)
       return toast({
         title: "Enter text to translate first!",
@@ -148,7 +151,7 @@ function Home() {
             onEnter={(name) => {
               startAudioForPermission();
               setUserName(name);
-              translate({ name });
+              askAi({ name });
             }}
           />
         ) : (
@@ -186,7 +189,7 @@ function Home() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={handleEnterKeyPress(() => {
-                  translate();
+                  askAi();
                 })}
               />
             </VStack>
@@ -196,7 +199,7 @@ function Home() {
                 h={9}
                 variant="outline"
                 onClick={() => {
-                  translate();
+                  askAi();
 
                   window.scrollTo({
                     left: 0,

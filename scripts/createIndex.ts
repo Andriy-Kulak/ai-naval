@@ -27,22 +27,25 @@ dotenv.config();
     apiKey: process.env.PINECONE_API_KEY as string,
     environment: process.env.PINECONE_ENVIRONMENT as string,
   });
+
+  // referencing index we want to upload to
   const pineconeIndex = client.Index(process.env.PINECONE_INDEX as string);
 
+  // loading pdf
   const loader = new PDFLoader("./scripts/navalPdf.pdf", {
     splitPages: false,
   });
-
   const docs = await loader.load();
 
+  // splitting pdf into chunks
   const splitter = new CharacterTextSplitter({
     separator: "\n",
     chunkSize: 2000,
     chunkOverlap: 200,
   });
-
   const splitDocs = await splitter.splitDocuments(docs);
 
+  // uploading chunks to pinecone
   await PineconeStore.fromDocuments(splitDocs, new OpenAIEmbeddings(), {
     pineconeIndex,
   });

@@ -55,26 +55,27 @@ async function askOpenAI({
   console.log("messages req: ", messages);
 
   // updated the message content to include context snippets
-  // if (messages?.length > 0) {
-  //   const lastMsgContent = messages[messages.length - 1].content;
+  if (messages?.length > 0) {
+    const lastMsgContent = messages[messages.length - 1].content;
 
-  //   const data = await pinecone.similaritySearch(lastMsgContent, 2);
+    const data = await pinecone.similaritySearch(lastMsgContent, 3);
 
-  //   console.log("pinecone data.length: ", data.length);
+    console.log("pinecone data.length: ", data.length);
 
-  //   const updatedMsgContent = `
-  //   user question/statement: ${lastMsgContent}
-  //   context snippets:
-  //   ---
-  //   1) ${data?.[0]?.pageContent}
-  //   ---
-  //   2) ${data?.[1]?.pageContent}
-  //   `;
+    const updatedMsgContent = `
+    user question/statement: ${lastMsgContent}
+    context snippets:
+    ---
+    1) ${data?.[0]?.pageContent}
+    ---
+    2) ${data?.[1]?.pageContent}
+    ---
+    3) ${data?.[2]?.pageContent}
+    `;
 
-  //   messages[messages.length - 1].content = updatedMsgContent;
-  // }
+    messages[messages.length - 1].content = updatedMsgContent;
+  }
 
-  console.log("messages length after pinecone: ", messages?.length);
   try {
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo-0301",
@@ -95,8 +96,6 @@ async function askOpenAI({
         ]),
       ],
     });
-
-    console.log("response: ", response);
 
     return response?.data?.choices?.[0]?.message?.content;
   } catch (e: any) {
